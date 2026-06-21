@@ -33,31 +33,26 @@ def extract_video_info(url: str) -> dict:
             'skip_download': True,
             'no_playlist': True,
             'flat_playlist': True,
+            'check_formats': False,
         }
 
         cookie_path = _get_cookie_path()
         if cookie_path:
             ydl_opts['cookiefile'] = cookie_path
 
-        info = None
-        for attempt in range(2):
+        with YoutubeDL(ydl_opts) as ydl:
             try:
-                with YoutubeDL(ydl_opts) as ydl:
-                    info = ydl.extract_info(url, download=False)
-                    break
+                info = ydl.extract_info(url, download=False)
             except Exception as e:
                 msg = str(e)
-                if attempt == 0 and 'Requested format is not available' in msg:
-                    ydl_opts['format'] = 'best'
-                    continue
                 if 'Unsupported URL' in msg or 'unsupported' in msg.lower():
                     return {'error': f'Unsupported URL: {url}'}
                 if 'Video unavailable' in msg or 'private' in msg.lower():
                     return {'error': 'Video unavailable'}
                 return {'error': msg[:500]}
 
-        if info is None:
-            return {'error': 'Could not extract video info'}
+        if not info:
+            return {'error': 'No data returned from yt-dlp'}
 
             if not info:
                 return {'error': 'No data returned from yt-dlp'}
