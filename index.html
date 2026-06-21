@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVA PLAYER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">&#9670;</span>
+        <h1>NOVA PLAYER</h1>
+      </div>
+      <p class="subtitle">Modern Video URL Player</p>
+    </header>
+
+    <main class="main-content">
+      <div class="input-section glass">
+        <div class="input-wrapper">
+          <input
+            type="url"
+            id="urlInput"
+            class="url-input"
+            placeholder="Paste video URL here..."
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+          >
+          <button id="playBtn" class="play-btn">
+            <span class="btn-icon">&#9654;</span>
+            PLAY VIDEO
+          </button>
+        </div>
+        <div id="errorMessage" class="error-message hidden"></div>
+      </div>
+
+      <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-spinner">
+          <div class="spinner-ring"></div>
+          <p>Extracting video information...</p>
+        </div>
+      </div>
+
+      <section class="history-section glass">
+        <div class="section-header">
+          <h2>Recent Videos</h2>
+          <button id="clearHistoryBtn" class="clear-btn hidden">Clear All</button>
+        </div>
+        <div id="historyList" class="history-list">
+          <div class="empty-history">
+            <span class="empty-icon">&#9654;</span>
+            <p>No videos yet. Paste a URL above to start.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>Powered by yt-dlp &mdash; NOVA PLAYER v1.0</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
