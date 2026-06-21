@@ -1,4 +1,20 @@
+import os
+import tempfile
+
 from yt_dlp import YoutubeDL
+
+
+def _get_cookie_path() -> str | None:
+    env_cookies = os.environ.get('YT_COOKIES', '')
+    if env_cookies:
+        path = os.path.join(tempfile.gettempdir(), 'yt_cookies.txt')
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(env_cookies)
+        return path
+    for candidate in ['data/cookies.txt', 'cookies.txt']:
+        if os.path.exists(candidate):
+            return candidate
+    return None
 
 
 def extract_video_info(url: str) -> dict:
@@ -11,6 +27,10 @@ def extract_video_info(url: str) -> dict:
             'no_playlist': True,
             'flat_playlist': True,
         }
+
+        cookie_path = _get_cookie_path()
+        if cookie_path:
+            ydl_opts['cookiefile'] = cookie_path
 
         with YoutubeDL(ydl_opts) as ydl:
             try:
