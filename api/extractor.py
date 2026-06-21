@@ -5,15 +5,22 @@ from yt_dlp import YoutubeDL
 
 
 def _get_cookie_path() -> str | None:
+    tmp = tempfile.gettempdir()
+    target = os.path.join(tmp, 'yt_cookies.txt')
+
     env_cookies = os.environ.get('YT_COOKIES', '')
     if env_cookies:
-        path = os.path.join(tempfile.gettempdir(), 'yt_cookies.txt')
-        with open(path, 'w', encoding='utf-8') as f:
+        with open(target, 'w', encoding='utf-8') as f:
             f.write(env_cookies)
-        return path
+        return target
+
     for candidate in ['data/cookies.txt', 'cookies.txt']:
         if os.path.exists(candidate):
-            return candidate
+            with open(candidate, 'r', encoding='utf-8') as src:
+                with open(target, 'w', encoding='utf-8') as dst:
+                    dst.write(src.read())
+            return target
+
     return None
 
 
