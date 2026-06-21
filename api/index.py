@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -39,11 +41,11 @@ class HistoryPositionRequest(BaseModel):
 
 
 class SettingsRequest(BaseModel):
-    default_volume: int | None = None
-    default_speed: float | None = None
-    theme: str | None = None
-    auto_resume: bool | None = None
-    auto_play: bool | None = None
+    default_volume: Optional[int] = None
+    default_speed: Optional[float] = None
+    theme: Optional[str] = None
+    auto_resume: Optional[bool] = None
+    auto_play: Optional[bool] = None
 
 
 @app.get('/api/status')

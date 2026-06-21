@@ -2,6 +2,7 @@ import json
 import os
 import hashlib
 from datetime import datetime, timedelta
+from typing import Optional
 
 VERCEL = os.environ.get('VERCEL', '') == '1'
 DATA_DIR = '/tmp/data' if VERCEL else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
@@ -39,7 +40,7 @@ def save_cache(cache: dict):
         json.dump(cache, f, indent=2)
 
 
-def get_cached(url: str) -> dict | None:
+def get_cached(url: str) -> Optional[dict]:
     cache = load_cache()
     key = _cache_key(url)
     entry = cache.get(key)
