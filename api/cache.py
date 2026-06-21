@@ -3,7 +3,8 @@ import os
 import hashlib
 from datetime import datetime, timedelta
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+VERCEL = os.environ.get('VERCEL', '') == '1'
+DATA_DIR = '/tmp/data' if VERCEL else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 CACHE_PATH = os.path.join(DATA_DIR, 'cache.json')
 
 CACHE_TTL_HOURS = 24

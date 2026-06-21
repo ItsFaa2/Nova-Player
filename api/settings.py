@@ -1,7 +1,8 @@
 import json
 import os
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+VERCEL = os.environ.get('VERCEL', '') == '1'
+DATA_DIR = '/tmp/data' if VERCEL else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 SETTINGS_PATH = os.path.join(DATA_DIR, 'settings.json')
 
 DEFAULT_SETTINGS = {

@@ -2,7 +2,8 @@ import json
 import os
 from datetime import datetime
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
+VERCEL = os.environ.get('VERCEL', '') == '1'
+DATA_DIR = '/tmp/data' if VERCEL else os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 HISTORY_PATH = os.path.join(DATA_DIR, 'history.json')
 
 MAX_HISTORY = 100
