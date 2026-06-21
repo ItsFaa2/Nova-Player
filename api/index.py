@@ -4,8 +4,9 @@ from typing import Optional
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from extractor import extract_video_info
@@ -23,6 +24,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def restore_path(request: Request, call_next):
+    path = request.query_params.get("__path")
+    if path is not None:
+        restored = "/" + path
+        request.scope["path"] = restored
+        qs = request.scope.get("query_string", b"").decode()
+        cleaned = "&".join(
+            p for p in qs.split("&") if not p.startswith("__path=")
+        )
+        request.scope["query_string"] = cleaned.encode()
+    return await call_next(request)
 
 
 class ExtractRequest(BaseModel):
@@ -132,3 +147,7 @@ def update_settings(req: SettingsRequest):
 def clear_cache_endpoint():
     clear_cache()
     return {'status': 'ok'}
+
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+app.mount("/", StaticFiles(directory=ROOT, html=True), name="static")
