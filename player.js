@@ -62,6 +62,24 @@ async function init() {
   loadStreamUrl();
 }
 
+let formatIndex = 0;
+let sortedFormats = [];
+
+function isH264(fmt) {
+  const v = (fmt.vcodec || '').toLowerCase();
+  return v.includes('avc1') || v.includes('h264');
+}
+
+function formatScore(fmt) {
+  let s = 0;
+  if (fmt.type === 'video+audio') s += 100;
+  else if (fmt.type === 'video') s += 50;
+  if (fmt.url) s += 20;
+  if (isH264(fmt)) s += 30;
+  if (fmt.height) s += (fmt.height / 1080) * 10;
+  return s;
+}
+
 async function loadStreamUrl() {
   if (!videoData.formats || videoData.formats.length === 0) {
     if (videoUrl) {
@@ -70,41 +88,34 @@ async function loadStreamUrl() {
     return;
   }
 
-  let selectedFormat = null;
+  sortedFormats = videoData.formats
+    .filter((f) => f.url)
+    .sort((a, b) => formatScore(b) - formatScore(a));
 
-  const videoFormats = videoData.formats.filter(
-    (f) => f.type === 'video+audio' && f.url
-  );
-
-  if (videoFormats.length > 0) {
-    selectedFormat = videoFormats
-      .filter((f) => f.height)
-      .sort((a, b) => b.height - a.height)[0]
-      || videoFormats[0];
-  }
-
-  if (!selectedFormat) {
-    const anyFormats = videoData.formats.filter((f) => f.url);
-    if (anyFormats.length > 0) {
-      selectedFormat = anyFormats[0];
-    }
-  }
-
-  if (!selectedFormat || !selectedFormat.url) {
+  if (sortedFormats.length === 0) {
     setErrorState('No stream URL available.');
     return;
   }
 
-  const streamUrl = selectedFormat.url;
+  formatIndex = 0;
+  tryFormat(true);
+}
 
-  videoPlayer.src = streamUrl;
+function tryFormat(first) {
+  if (formatIndex >= sortedFormats.length) {
+    setErrorState('Video playback error. Try a different format.');
+    return;
+  }
+
+  const fmt = sortedFormats[formatIndex];
+  videoPlayer.src = fmt.url;
   videoPlayer.load();
 
   if (videoData.thumbnail) {
     thumbnailImg.src = videoData.thumbnail;
   }
 
-  attachPlayerEvents();
+  if (first) attachPlayerEvents();
 }
 
 function setErrorState(msg) {
@@ -216,7 +227,14 @@ function onEnded() {
 
 function onVideoError() {
   loadingIndicator.classList.add('hidden');
-  setErrorState('Video playback error. Try a different format.');
+  formatIndex++;
+  if (formatIndex < sortedFormats.length) {
+    videoPlayer.removeAttribute('src');
+    videoPlayer.load();
+    tryFormat(false);
+  } else {
+    setErrorState('Video playback error. Try a different format.');
+  }
 }
 
 function togglePlay() {

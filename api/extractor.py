@@ -64,7 +64,10 @@ def extract_video_info(url: str) -> dict:
 
             ext = fmt.get('ext', '')
             fmt_url = fmt.get('url', '')
+            protocol = fmt.get('protocol', '')
             if not fmt_url:
+                continue
+            if protocol in ('m3u8', 'm3u8_native', 'hls', 'http_dash_segments'):
                 continue
 
             format_note = fmt.get('format_note', '')
